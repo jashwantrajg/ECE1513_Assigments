@@ -15,17 +15,15 @@ def fit_perceptron(X_train, y_train):
         Value=errorPer(X_train, y_train, Weights) # Calls the errorPer to calculate our loss so that we know when to stop
         #print(Value)                             #As this is the pocket algorithm and it stops when the 
         if(epoch==0):                             #E(in) of W+1 is greater than E(in) of W
-            Prev_Loss=Value['Loss']
+            Prev_Loss=Value
         else:
-            if(Value['Loss']>Prev_Loss):            #The else condition checks for E(in) and based on that stops the execution
-                #print(Prev_Loss)
-                #print('Final Weights',prev_weights)
-                return prev_weights                   #It returns the final weights that can be used on Test data
+            if(round(Value,2)==0.00):            #The else condition checks for E(in) and based on that stops the execution
+                return Weights                   #It returns the final weights that can be used on Test data
                 break
             else:
-                Prev_Loss=Value['Loss']             #It would reach this else state only when there is an update of weights
+                Prev_Loss=Value             #It would reach this else state only when there is an update of weights
                 prev_weights=Weights           #Stores the previous weights just incase the above else condition is true
-                Weights=Weights+y_train[Value['index']]*X_train[Value['index']]
+                Weights=Weights+y_train[vector]*X_train[vector]
     return prev_weights                         #The final weights are returned 
 
 def errorPer(X_train,y_train,w):
@@ -33,8 +31,10 @@ def errorPer(X_train,y_train,w):
     y_predicted=[]                              #This function is for calcualting the Loss and also providing the index     
     for i in range(y_train.shape[0]):           #of the which sample of X needs to taken to update the weights
         y_predicted.append(pred(X_train[i],w))
-    y_predicted=np.array(y_predicted)           
-    return {'Loss':((1*(y_predicted!=y_train)).sum())/y_train.shape[0],'index':np.argmax((y_predicted!=y_train)==True)}
+    y_predicted=np.array(y_predicted)    
+    global vector  
+    vector=np.argmax((y_predicted!=y_train)==True)     
+    return ((1*(y_predicted!=y_train)).sum())/y_train.shape[0]
 
 def confMatrix(X_train,y_train,w):
     #Add implementation here
@@ -85,8 +85,6 @@ def test_Part1():
     #Pocket algorithm using Numpy
     w=fit_perceptron(X_train,y_train)
     cM=confMatrix(X_test,y_test,w)
-    print('Weights used',w)
-    print('Confusion Matrix',cM)
 
     #Pocket algorithm using scikit-learn
     sciKit=test_SciKit(X_train, X_test, y_train, y_test)
@@ -98,3 +96,4 @@ def test_Part1():
     
 
 test_Part1()
+ 
