@@ -1,7 +1,8 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import Perceptron
-from sklearn.metrics import confusion_matrix 
+from sklearn.metrics import confusion_matrix,accuracy_score
+
 
 def fit_perceptron(X_train, y_train):
     #Add implementation here 
@@ -42,8 +43,10 @@ def confMatrix(X_train,y_train,w):
     N,d=X_train.shape                           #It is a matrix that can depict how many samples were correctly predicted
     ones=np.ones((N,1))                         #and how many were incorrectly predicted. Its a 2x2 matrix with the correctly
     X_train=np.hstack((ones,X_train))           #predicted samples depicted as the primary diagonals of the matrix.
+    output=[]
     for sample in range(y_train.shape[0]):
         prediction=pred(X_train[sample],w)
+        output.append(prediction)
         if(prediction == y_train[sample]):
             if prediction == -1:
                 ConfusionMatrix[0,0]+=1
@@ -54,6 +57,7 @@ def confMatrix(X_train,y_train,w):
                 ConfusionMatrix[0,1]+=1
             elif prediction == 1:
                 ConfusionMatrix[1,0]+=1 
+    print('Precision score',accuracy_score(output, y_train))
     return ConfusionMatrix                     #We return the calcualted confusion matrix
 
 def pred(X_train,w):
@@ -69,7 +73,12 @@ def pred(X_train,w):
 
 def test_SciKit(X_train, X_test, Y_train, Y_test):
     #Add implementation here 
-    pass
+    #We set the max iteration to 5000 and the exit criteria as 0.0001
+    percp= Perceptron(max_iter=5000, tol=1e-3, random_state=0)#,verbose=1) 
+    percp.fit(X_train,Y_train) #We fit the model to X_train
+    print('Precision score using sciKit',percp.score(X_train,Y_train))
+    y_pred= percp.predict(X_test) #The fit model is used to predict X_test data
+    return confusion_matrix(Y_test,y_pred)
 
 def test_Part1():
     from sklearn.datasets import load_iris
@@ -97,3 +106,10 @@ def test_Part1():
 
 test_Part1()
  
+'''
+ANSWERS:
+1. tol pararmeter is the stopping criterion. It will stop when loss>previous_loss-tol
+2. max_iter= 5000 doesnt not guarentee that the data will be passed pver 5000 times.
+3. We set the weights of a model by calcualting it using the least square solution.
+4. We can judge that using the accuracy score.
+'''
